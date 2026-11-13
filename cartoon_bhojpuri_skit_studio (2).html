@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartoon Bhojpuri Skit Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts: Fredoka & Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #070913;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .font-cartoon {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .btn-soft {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-soft:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(244, 114, 182, 0.35);
+        }
+        .btn-soft:active {
+            transform: translateY(0px) scale(0.98);
+        }
+        canvas {
+            touch-action: manipulation;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-3 sm:p-6 bg-gradient-to-b from-slate-950 via-[#0d1326] to-slate-950">
+
+    <!-- Top Navigation Bar -->
+    <header class="w-full max-w-7xl flex items-center justify-between px-4 sm:px-6 py-3.5 glass-panel rounded-2xl shadow-lg z-10 mb-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-pink-500 flex items-center justify-center text-white text-xl shadow-md">
+                🎭
+            </div>
+            <div>
+                <h1 class="font-cartoon text-lg sm:text-xl font-bold tracking-tight bg-gradient-to-r from-amber-400 to-pink-400 bg-clip-text text-transparent">
+                    Bhojpuri Drama Toon Studio
+                </h1>
+                <p class="text-xs text-slate-400 hidden sm:block">
+                    Interactive Voice-Synthesized Cartoon Skit & Sound Engine
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+            <div id="statusBadge" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-900/80 text-slate-300 border border-slate-700 flex items-center gap-1.5">
+                <span id="statusDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="statusText">Ready to Play</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Side-by-Side Workspace -->
+    <main class="w-full max-w-7xl flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch mb-4">
+        
+        <!-- LEFT PANEL: Visual Procedural Canvas Stage -->
+        <section class="lg:col-span-7 flex flex-col glass-panel rounded-3xl shadow-2xl overflow-hidden border border-white/15">
+            <!-- Stage Header -->
+            <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between bg-slate-900/60">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+                        Live Stage
+                    </span>
+                    <span id="sceneCounter" class="text-xs font-medium text-slate-300">
+                        Scene: Idle
+                    </span>
+                </div>
+                <button id="testFartBtn" class="btn-soft text-xs font-semibold px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-lime-500/20 to-emerald-500/20 text-lime-300 border border-lime-500/30 flex items-center gap-1.5">
+                    💨 Test Finale FX
+                </button>
+            </div>
+
+            <!-- Cartoon Stage Canvas Viewport -->
+            <div id="stageViewport" class="relative flex-1 min-h-[400px] sm:min-h-[460px] bg-slate-950 overflow-hidden flex flex-col justify-between p-4 select-none">
+                <canvas id="storyCanvas" class="absolute inset-0 w-full h-full block cursor-pointer"></canvas>
+
+                <!-- Speech Bubble Overlay -->
+                <div id="captionContainer" class="absolute top-4 left-1/2 -translate-x-1/2 w-[90%] sm:w-[82%] max-w-lg px-5 py-3 rounded-2xl glass-panel text-center shadow-2xl transition-all duration-300 pointer-events-none z-20">
+                    <span id="bubbleSpeakerBadge" class="block text-[10px] font-bold uppercase tracking-wider text-pink-400 mb-1">Director Cue</span>
+                    <p id="dialogueText" class="text-sm sm:text-base font-semibold text-rose-100 leading-snug drop-shadow">
+                        Press "Play Full Scene" to start the Bhojpuri skit!
+                    </p>
+                </div>
+
+                <!-- Tap Hint -->
+                <div class="absolute bottom-3 right-3 text-[11px] text-white/60 bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm pointer-events-none z-20">
+                    Tap stage for bonus cartoon clouds 💨
+                </div>
+            </div>
+
+            <!-- Stage Playback Controls Footer -->
+            <div class="p-4 bg-slate-900/80 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <button id="playSceneBtn" class="btn-soft px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 hover:opacity-95 text-white font-bold text-sm shadow-lg flex items-center gap-2">
+                        <span id="playBtnIcon">▶️</span>
+                        <span id="playBtnText">Play Full Scene</span>
+                    </button>
+                    <button id="stopSceneBtn" class="btn-soft px-4 py-2.5 rounded-xl glass-panel hover:bg-white/10 text-slate-200 font-semibold text-sm flex items-center gap-1.5">
+                        <span>⏹️</span>
+                        <span>Stop</span>
+                    </button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="flex-1 min-w-[140px] max-w-xs">
+                    <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
+                        <span>Skit Progress</span>
+                        <span id="progressLabel">0 / 5</span>
+                    </div>
+                    <div class="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
+                        <div id="progressBar" class="h-full bg-gradient-to-r from-indigo-400 via-pink-400 to-amber-300 w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL: Interactive Dialogue Script & Voice Controller -->
+        <section class="lg:col-span-5 flex flex-col glass-panel rounded-3xl shadow-2xl overflow-hidden border border-white/15">
+            
+            <!-- Script Header -->
+            <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between bg-slate-900/60">
+                <h2 class="font-bold text-sm flex items-center gap-2 text-rose-200">
+                    <span>📜</span>
+                    <span>Dialogue Script & Voice Preview</span>
+                </h2>
+                <span id="voiceCountBadge" class="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-white/10 text-slate-300">
+                    Loading Voices...
+                </span>
+            </div>
+
+            <!-- Dialogue Lines Container -->
+            <div id="scriptList" class="flex-1 p-4 space-y-3 overflow-y-auto max-h-[360px] lg:max-h-none">
+                <!-- Cards injected dynamically -->
+            </div>
+
+            <!-- Voice Tuning Panel -->
+            <div class="p-4 bg-slate-950/80 border-t border-white/10 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                        🎙️ Voice Engine Tuning
+                    </span>
+                    <button id="resetVoicesBtn" class="text-xs text-indigo-400 hover:underline font-medium">
+                        Reset Defaults
+                    </button>
+                </div>
+
+                <!-- Voice Selectors -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label for="boyVoiceSelect" class="block text-[11px] font-semibold text-blue-400 mb-1">
+                            👦 Boy Voice (Babiya)
+                        </label>
+                        <select id="boyVoiceSelect" class="w-full text-xs rounded-xl border border-white/15 bg-slate-900 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Auto-Select Male Voice</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="girlVoiceSelect" class="block text-[11px] font-semibold text-pink-400 mb-1">
+                            👧 Girl Voice (Momiya)
+                        </label>
+                        <select id="girlVoiceSelect" class="w-full text-xs rounded-xl border border-white/15 bg-slate-900 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500">
+                            <option value="">Auto-Select Female Voice</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Pitch & Rate Sliders -->
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <div class="bg-slate-900/80 p-2.5 rounded-xl border border-white/10">
+                        <div class="flex justify-between text-[10px] font-semibold mb-1">
+                            <span class="text-blue-400">Boy Pitch</span>
+                            <span id="boyPitchVal">0.78</span>
+                        </div>
+                        <input id="boyPitch" type="range" min="0.5" max="1.3" step="0.02" value="0.78" class="w-full accent-blue-500 cursor-pointer">
+                    </div>
+
+                    <div class="bg-slate-900/80 p-2.5 rounded-xl border border-white/10">
+                        <div class="flex justify-between text-[10px] font-semibold mb-1">
+                            <span class="text-pink-400">Girl Pitch</span>
+                            <span id="girlPitchVal">1.35</span>
+                        </div>
+                        <input id="girlPitch" type="range" min="0.9" max="1.7" step="0.02" value="1.35" class="w-full accent-pink-500 cursor-pointer">
+                    </div>
+
+                    <div class="bg-slate-900/80 p-2.5 rounded-xl border border-white/10">
+                        <div class="flex justify-between text-[10px] font-semibold mb-1">
+                            <span class="text-slate-300">Speed</span>
+                            <span id="speechRateVal">0.95x</span>
+                        </div>
+                        <input id="speechRate" type="range" min="0.7" max="1.3" step="0.05" value="0.95" class="w-full accent-indigo-500 cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        /**
+         * =========================================================================
+         * 1. SKIT DATA & STATE CONFIGURATION
+         * =========================================================================
+         */
+        const SKIT_LINES = [
+            {
+                id: 0,
+                speaker: 'boy',
+                name: 'Babiya (Boy)',
+                text: 'Momiya hamra se galti hogail hamra ke maaf kardi na jannnnnnn 💔',
+                speechHi: 'मोमिया हमरा से गलती हो गइल, हमरा के माफ़ कर दी ना जान!',
+                speechEnIn: 'Momiya hamra se galti ho gail, hamra ke maaf kar di na jaan!',
+                emotion: 'pleading'
+            },
+            {
+                id: 1,
+                speaker: 'girl',
+                name: 'Momiya (Girl)',
+                text: 'Babiya ham hurt bani ae hi khatir char din से na hagni jannnnnnn 💔',
+                speechHi: 'बबिया हम हर्ट बानी, एही खातिर चार दिन से ना हगनी जान!',
+                speechEnIn: 'Babiya ham hurt bani, ehi khatir char din se na hagni jaan!',
+                emotion: 'dramatic'
+            },
+            {
+                id: 2,
+                speaker: 'boy',
+                name: 'Babiya (Boy)',
+                text: 'Huhh momiya tu kahe na haglu tohar gariya chat lem chali hamra muhiya mein hagdi lekin hamra ke maaf kardina momiya 💔',
+                speechHi: 'हुंह मोमिया तू काहे ना हगलू, तोहार गरिया चाट लेम, चली हमरा मुहिया में हग दी, लेकिन हमरा के माफ़ कर दी ना मोमिया!',
+                speechEnIn: 'Huhh momiya tu kahe na haglu, tohar gariya chat lem, chali hamra muhiya mein hag di, lekin hamra ke maaf kar di na momiya!',
+                emotion: 'desperate'
+            },
+            {
+                id: 3,
+                speaker: 'girl',
+                name: 'Momiya (Girl)',
+                text: 'Babiya chal ab mafi mat mangi na to tohra muhiya mein hagdem jannnnnnnnn 💔',
+                speechHi: 'बबिया चल अब माफ़ी मत मांगी, ना तो तोहरा मुहिया में हग देम जान!',
+                speechEnIn: 'Babiya chal ab maafi mat mangi, na to tohra muhiya mein hag dem jaan!',
+                emotion: 'sassy'
+            },
+            {
+                id: 4,
+                speaker: 'finale',
+                name: 'Warm Hug & Momiya Finale FX',
+                text: '🥹❤️💨 Both hug tightly crying happy tears & Momiya blasts a huge cartoon cloud!',
+                speechHi: 'हा हा हा हा!',
+                speechEnIn: 'Ha ha ha ha!',
+                emotion: 'finale'
+            }
+        ];
+
+        function normalizeTextForSpeech(rawText) {
+            return rawText
+                .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
+                .replace(/([a-zA-Z])\1{2,}/g, '$1$1')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        // DOM Elements
+        const playSceneBtn = document.getElementById('playSceneBtn');
+        const playBtnIcon = document.getElementById('playBtnIcon');
+        const playBtnText = document.getElementById('playBtnText');
+        const stopSceneBtn = document.getElementById('stopSceneBtn');
+        const testFartBtn = document.getElementById('testFartBtn');
+        const resetVoicesBtn = document.getElementById('resetVoicesBtn');
+
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const sceneCounter = document.getElementById('sceneCounter');
+        const progressBar = document.getElementById('progressBar');
+        const progressLabel = document.getElementById('progressLabel');
+
+        const bubbleSpeakerBadge = document.getElementById('bubbleSpeakerBadge');
+        const dialogueText = document.getElementById('dialogueText');
+        const scriptList = document.getElementById('scriptList');
+        const voiceCountBadge = document.getElementById('voiceCountBadge');
+
+        const boyVoiceSelect = document.getElementById('boyVoiceSelect');
+        const girlVoiceSelect = document.getElementById('girlVoiceSelect');
+        const boyPitchSlider = document.getElementById('boyPitch');
+        const girlPitchSlider = document.getElementById('girlPitch');
+        const speechRateSlider = document.getElementById('speechRate');
+        const boyPitchVal = document.getElementById('boyPitchVal');
+        const girlPitchVal = document.getElementById('girlPitchVal');
+        const speechRateVal = document.getElementById('speechRateVal');
+
+        const storyCanvas = document.getElementById('storyCanvas');
+        const ctx = storyCanvas.getContext('2d');
+
+        // Runtime State
+        let availableVoices = [];
+        let isPlayingSequence = false;
+        let currentStepIndex = -1;
+        let activeSpeaker = 'none';
+        let isVoiceSpeaking = false;
+        let activeUtterance = null;
+        let fallbackTimer = null;
+        let audioCtx = null;
+
+        /**
+         * =========================================================================
+         * 2. WEB AUDIO API: SYNTHESIZED CARTOON SOUND EFFECTS
+         * =========================================================================
+         */
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume().catch(() => {});
+            }
+        }
+
+        function playCartoonFartSound() {
+            initAudioContext();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+            const duration = 1.15;
+
+            // Main bass oscillator with comical pitch drop
+            const osc = audioCtx.createOscillator();
+            const subOsc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+
+            osc.type = 'sawtooth';
+            subOsc.type = 'triangle';
+
+            osc.frequency.setValueAtTime(145, now);
+            osc.frequency.exponentialRampToValueAtTime(52, now + duration * 0.85);
+            osc.frequency.exponentialRampToValueAtTime(38, now + duration);
+
+            subOsc.frequency.setValueAtTime(75, now);
+            subOsc.frequency.exponentialRampToValueAtTime(28, now + duration);
+
+            // Flutter modulation for realistic cartoon sputtering
+            const lfo = audioCtx.createOscillator();
+            const lfoGain = audioCtx.createGain();
+            lfo.frequency.setValueAtTime(24, now);
+            lfo.frequency.linearRampToValueAtTime(14, now + duration);
+            lfoGain.gain.setValueAtTime(28, now);
+
+            lfo.connect(lfoGain);
+            lfoGain.connect(osc.frequency);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(460, now);
+            filter.Q.setValueAtTime(4.5, now);
+
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(0.42, now + 0.06);
+            gain.gain.setValueAtTime(0.36, now + duration * 0.65);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+            osc.connect(filter);
+            subOsc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start(now);
+            subOsc.start(now);
+            lfo.start(now);
+
+            osc.stop(now + duration + 0.05);
+            subOsc.stop(now + duration + 0.05);
+            lfo.stop(now + duration + 0.05);
+        }
+
+        /**
+         * =========================================================================
+         * 3. WEB SPEECH API: BHOJPURI / HINDI VOICE ENGINE
+         * =========================================================================
+         */
+        function loadVoices() {
+            if (!('speechSynthesis' in window)) {
+                voiceCountBadge.textContent = 'TTS Unsupported';
+                return;
+            }
+
+            availableVoices = window.speechSynthesis.getVoices();
+            if (!availableVoices.length) {
+                voiceCountBadge.textContent = 'Loading Voices...';
+                return;
+            }
+
+            voiceCountBadge.textContent = `${availableVoices.length} Voices Ready`;
+
+            const prevBoy = boyVoiceSelect.value;
+            const prevGirl = girlVoiceSelect.value;
+
+            boyVoiceSelect.innerHTML = '<option value="">Auto-Select Male (Bhojpuri/Hindi)</option>';
+            girlVoiceSelect.innerHTML = '<option value="">Auto-Select Female (Bhojpuri/Hindi)</option>';
+
+            const hindiVoices = availableVoices.filter(v => v.lang.toLowerCase().startsWith('hi'));
+            const indianEnVoices = availableVoices.filter(v => v.lang.toLowerCase() === 'en-in');
+            const otherVoices = availableVoices.filter(v =>
+                !v.lang.toLowerCase().startsWith('hi') && v.lang.toLowerCase() !== 'en-in'
+            );
+
+            const sortedVoices = [...hindiVoices, ...indianEnVoices, ...otherVoices];
+
+            sortedVoices.forEach(voice => {
+                const optBoy = document.createElement('option');
+                optBoy.value = voice.name;
+                optBoy.textContent = `${voice.name} (${voice.lang})`;
+                boyVoiceSelect.appendChild(optBoy);
+
+                const optGirl = document.createElement('option');
+                optGirl.value = voice.name;
+                optGirl.textContent = `${voice.name} (${voice.lang})`;
+                girlVoiceSelect.appendChild(optGirl);
+            });
+
+            if (prevBoy) boyVoiceSelect.value = prevBoy;
+            if (prevGirl) girlVoiceSelect.value = prevGirl;
+
+            // Auto-assign best matching Indian/Hindi male & female voices
+            if (!boyVoiceSelect.value) {
+                const maleHint = /(male|man|ravi|hemant|prabhat|madhur|david|daniel|mark|google हिन्दी)/i;
+                const bestBoy =
+                    hindiVoices.find(v => maleHint.test(v.name)) ||
+                    indianEnVoices.find(v => maleHint.test(v.name)) ||
+                    hindiVoices[0] ||
+                    indianEnVoices[0] ||
+                    availableVoices[0];
+                if (bestBoy) boyVoiceSelect.value = bestBoy.name;
+            }
+
+            if (!girlVoiceSelect.value) {
+                const femaleHint = /(female|woman|swara|heera|kalpana|lekha|neerja|priya|aditi|raveena|zira|samantha|google हिन्दी)/i;
+                const bestGirl =
+                    hindiVoices.find(v => femaleHint.test(v.name)) ||
+                    indianEnVoices.find(v => femaleHint.test(v.name)) ||
+                    hindiVoices.find(v => v.name !== boyVoiceSelect.value) ||
+                    hindiVoices[0] ||
+                    indianEnVoices[0] ||
+                    availableVoices[0];
+                if (bestGirl) girlVoiceSelect.value = bestGirl.name;
+            }
+        }
+
+        function speakLine(line, onCompleteCallback) {
+            if (!('speechSynthesis' in window)) {
+                setTimeout(onCompleteCallback, 1800);
+                return;
+            }
+
+            clearTimeout(fallbackTimer);
+
+            if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+                try {
+                    window.speechSynthesis.cancel();
+                } catch (e) {}
+            }
+
+            const isBoy = line.speaker === 'boy';
+            const selectedName = isBoy ? boyVoiceSelect.value : girlVoiceSelect.value;
+            const chosenVoice = availableVoices.find(v => v.name === selectedName) || availableVoices[0] || null;
+
+            const voiceLang = chosenVoice ? chosenVoice.lang.toLowerCase() : 'hi-in';
+            const usesHindiScript = voiceLang.startsWith('hi');
+
+            const textToSpeak = usesHindiScript
+                ? (line.speechHi || normalizeTextForSpeech(line.text))
+                : (line.speechEnIn || normalizeTextForSpeech(line.text));
+
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            activeUtterance = utterance;
+
+            if (chosenVoice) {
+                utterance.voice = chosenVoice;
+                utterance.lang = chosenVoice.lang;
+            } else {
+                utterance.lang = 'hi-IN';
+            }
+
+            const basePitch = isBoy
+                ? parseFloat(boyPitchSlider.value)
+                : parseFloat(girlPitchSlider.value);
+
+            // If Boy and Girl share the same single Hindi voice on a device, separate pitch strongly
+            const sameVoiceSelected = boyVoiceSelect.value && boyVoiceSelect.value === girlVoiceSelect.value;
+            utterance.pitch = sameVoiceSelected
+                ? (isBoy ? Math.max(0.62, basePitch - 0.14) : Math.min(1.65, basePitch + 0.15))
+                : basePitch;
+
+            utterance.rate = parseFloat(speechRateSlider.value);
+            utterance.volume = 1.0;
+
+            const wordCount = textToSpeak.split(/\s+/).length;
+            const safetyTimeoutMs = Math.max(3000, wordCount * 520 + 1800);
+
+            let finished = false;
+            const finishOnce = () => {
+                if (finished) return;
+                finished = true;
+                isVoiceSpeaking = false;
+                clearTimeout(fallbackTimer);
+                activeUtterance = null;
+                onCompleteCallback();
+            };
+
+            utterance.onstart = () => {
+                isVoiceSpeaking = true;
+            };
+            utterance.onend = finishOnce;
+            utterance.onerror = (err) => {
+                if (err && err.error === 'interrupted') return;
+                finishOnce();
+            };
+
+            fallbackTimer = setTimeout(finishOnce, safetyTimeoutMs);
+
+            try {
+                if (window.speechSynthesis.paused) {
+                    window.speechSynthesis.resume();
+                }
+                isVoiceSpeaking = true;
+                window.speechSynthesis.speak(utterance);
+            } catch (e) {
+                finishOnce();
+            }
+        }
+
+        /**
+         * =========================================================================
+         * 4. UI & SCRIPT CARD RENDERING
+         * =========================================================================
+         */
+        function updateStatusBadge(label, isActive) {
+            statusText.textContent = label;
+            statusDot.className = isActive
+                ? 'w-2 h-2 rounded-full bg-amber-400 animate-ping'
+                : 'w-2 h-2 rounded-full bg-emerald-400';
+        }
+
+        function updateStageVisuals(line) {
+            activeSpeaker = line.speaker;
+            sceneCounter.textContent = `Scene ${line.id + 1} of ${SKIT_LINES.length}`;
+            dialogueText.textContent = line.text;
+
+            if (line.speaker === 'boy') {
+                bubbleSpeakerBadge.textContent = '👦 Babiya (Boy)';
+                bubbleSpeakerBadge.className = 'block text-[10px] font-bold uppercase tracking-wider text-blue-400 mb-1';
+            } else if (line.speaker === 'girl') {
+                bubbleSpeakerBadge.textContent = '👧 Momiya (Girl)';
+                bubbleSpeakerBadge.className = 'block text-[10px] font-bold uppercase tracking-wider text-pink-400 mb-1';
+            } else {
+                bubbleSpeakerBadge.textContent = '🥹❤️💨 Warm Hug & Finale FX';
+                bubbleSpeakerBadge.className = 'block text-[10px] font-bold uppercase tracking-wider text-amber-400 mb-1';
+            }
+        }
+
+        function highlightActiveCard(index) {
+            document.querySelectorAll('.script-card').forEach((card, i) => {
+                if (i === index) {
+                    card.classList.add('ring-2', 'ring-pink-500', 'bg-slate-800/90');
+                } else {
+                    card.classList.remove('ring-2', 'ring-pink-500', 'bg-slate-800/90');
+                }
+            });
+        }
+
+        function renderScriptCards() {
+            scriptList.innerHTML = '';
+            SKIT_LINES.forEach((line, idx) => {
+                const isBoy = line.speaker === 'boy';
+                const isGirl = line.speaker === 'girl';
+
+                const badgeColor = isBoy
+                    ? 'bg-blue-500/20 text-blue-300 border-blue-400/30'
+                    : isGirl
+                        ? 'bg-pink-500/20 text-pink-300 border-pink-400/30'
+                        : 'bg-amber-500/20 text-amber-300 border-amber-400/30';
+
+                const avatar = isBoy ? '👦' : isGirl ? '👧' : '💨';
+
+                const card = document.createElement('div');
+                card.className = 'script-card p-3.5 rounded-2xl bg-slate-900/70 border border-white/10 transition-all hover:border-white/25 flex items-start justify-between gap-3';
+                card.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="text-base">${avatar}</span>
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-md border ${badgeColor}">
+                                ${line.name}
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-medium">#${idx + 1}</span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+                            ${line.text}
+                        </p>
+                    </div>
+                    <button data-preview-idx="${idx}" class="preview-line-btn shrink-0 w-9 h-9 rounded-xl bg-white/10 hover:bg-pink-500/30 text-white flex items-center justify-center transition" title="Preview this line">
+                        🔊
+                    </button>
+                `;
+                scriptList.appendChild(card);
+            });
+
+            document.querySelectorAll('.preview-line-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.dataset.previewIdx, 10);
+                    const line = SKIT_LINES[idx];
+                    initAudioContext();
+                    isPlayingSequence = false;
+                    currentStepIndex = idx;
+                    updateStageVisuals(line);
+                    highlightActiveCard(idx);
+                    updateStatusBadge(`Previewing #${idx + 1}`, true);
+
+                    if (line.speaker === 'finale') {
+                        playCartoonFartSound();
+                        spawnFartClouds();
+                    }
+
+                    speakLine(line, () => {
+                        updateStatusBadge('Ready to Play', false);
+                    });
+                });
+            });
+        }
+
+        /**
+         * =========================================================================
+         * 5. PROCEDURAL REALISTIC STAGE & CHARACTER ANIMATION ENGINE
+         * =========================================================================
+         */
+        let W = 800, H = 450, dpr = 1;
+        const particles = [];
+
+        const rainDrops = Array.from({ length: 70 }, () => ({
+            x: Math.random(),
+            y: Math.random(),
+            speed: 0.65 + Math.random() * 0.55,
+            len: 9 + Math.random() * 11
+        }));
+
+        const ambientPetals = Array.from({ length: 24 }, () => ({
+            x: Math.random(),
+            y: Math.random(),
+            vx: -0.015 + Math.random() * 0.04,
+            vy: 0.03 + Math.random() * 0.04,
+            size: 3.5 + Math.random() * 4,
+            rot: Math.random() * Math.PI * 2,
+            vRot: (Math.random() - 0.5) * 2.0,
+            hue: Math.random() > 0.5 ? '#fda4af' : '#fde68a'
+        }));
+
+        const charRig = {
+            boyXRatio: 0.24,
+            girlXRatio: 0.76,
+            boyKneel: 0,
+            hugProgress: 0,
+            warmth: 0,
+            walkCycleBoy: 0,
+            walkCycleGirl: 0
+        };
+
+        const groundPoops = [];
+
+        function lerp(a, b, t) {
+            return a + (b - a) * Math.min(1, Math.max(0, t));
+        }
+
+        function lerpColor(hexA, hexB, t) {
+            const a = parseInt(hexA.slice(1), 16);
+            const b = parseInt(hexB.slice(1), 16);
+            const rA = (a >> 16) & 255, gA = (a >> 8) & 255, bA = a & 255;
+            const rB = (b >> 16) & 255, gB = (b >> 8) & 255, bB = b & 255;
+            const r = Math.round(lerp(rA, rB, t));
+            const g = Math.round(lerp(gA, gB, t));
+            const bl = Math.round(lerp(bA, bB, t));
+            return `rgb(${r}, ${g}, ${bl})`;
+        }
+
+        function resizeCanvas() {
+            const rect = storyCanvas.parentElement.getBoundingClientRect();
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            W = rect.width || 800;
+            H = rect.height || 450;
+            storyCanvas.width = W * dpr;
+            storyCanvas.height = H * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function spawnFartClouds() {
+            const w = W;
+            const h = H;
+            const groundY = h * 0.78;
+            // Originates directly at Momiya's lower hip/dress back edge
+            const hipX = w * charRig.girlXRatio + 12;
+            const hipY = groundY - 22;
+            const colors = ['#a3e635', '#bef264', '#fde047', '#84cc16', '#4ade80'];
+
+            for (let i = 0; i < 52; i++) {
+                const spreadAngle = (Math.random() - 0.35) * 0.85;
+                const speed = 2.0 + Math.random() * 4.5;
+                particles.push({
+                    type: 'cloud',
+                    x: hipX + (Math.random() - 0.2) * 14,
+                    y: hipY + (Math.random() - 0.5) * 12,
+                    vx: Math.cos(spreadAngle) * speed,
+                    vy: Math.sin(spreadAngle) * speed - 0.6,
+                    radius: Math.random() * 24 + 13,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: 0.96,
+                    decay: 0.009 + Math.random() * 0.006
+                });
+            }
+
+            // Cartoon poop emerges directly from Momiya's lower back/hip and drops in an arc onto the ground
+            groundPoops.push({
+                startX: hipX - 2,
+                startY: hipY,
+                x: hipX - 2,
+                y: hipY,
+                vx: 1.55 + Math.random() * 0.55,
+                vy: -1.1,
+                rotation: -0.35,
+                vRot: 0.08,
+                targetY: groundY - 1,
+                landed: false,
+                emergeProgress: 0,
+                wobbleTime: 0
+            });
+
+            ['💨', '💨', '🥹', '❤️', '😂'].forEach((emoji, i) => {
+                particles.push({
+                    type: 'emoji',
+                    text: emoji,
+                    x: w * (0.45 + i * 0.042),
+                    y: h * 0.54,
+                    vx: (Math.random() - 0.35) * 2.2,
+                    vy: -1.7 - Math.random() * 1.1,
+                    alpha: 1,
+                    decay: 0.011
+                });
+            });
+        }
+
+        function drawFloatingTag(label, x, y, bgColor, borderColor, time) {
+            const floatY = y + Math.sin(time * 3.0) * 3.5;
+            ctx.save();
+            ctx.font = "700 12px 'Outfit', sans-serif";
+            const textW = ctx.measureText(label).width;
+            const pillW = Math.max(46, textW + 24);
+            const pillH = 24;
+
+            ctx.shadowColor = borderColor;
+            ctx.shadowBlur = 12;
+
+            ctx.fillStyle = bgColor;
+            ctx.strokeStyle = borderColor;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.roundRect(x - pillW / 2, floatY - pillH, pillW, pillH, 12);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x - 4, floatY);
+            ctx.lineTo(x + 4, floatY);
+            ctx.lineTo(x, floatY + 5);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = "#ffffff";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(label, x, floatY - pillH / 2 + 0.5);
+            ctx.restore();
+        }
+
+        function drawBackground(state) {
+            const topColor = lerpColor("#0b1120", "#451a03", state.warmth);
+            const midColor = lerpColor("#172554", "#9a3412", state.warmth);
+            const botColor = lerpColor("#0f172a", "#431407", state.warmth);
+
+            const grad = ctx.createLinearGradient(0, 0, 0, H);
+            grad.addColorStop(0, topColor);
+            grad.addColorStop(0.55, midColor);
+            grad.addColorStop(1, botColor);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            // Moon / Sunset Glow
+            const moonX = W * 0.74;
+            const moonY = H * 0.22;
+            const moonGlow = ctx.createRadialGradient(moonX, moonY, 8, moonX, moonY, 125);
+            if (state.warmth > 0.4) {
+                moonGlow.addColorStop(0, `rgba(253, 224, 71, ${0.42 * state.warmth})`);
+                moonGlow.addColorStop(0.45, `rgba(251, 146, 60, ${0.18 * state.warmth})`);
+            } else {
+                moonGlow.addColorStop(0, "rgba(186, 230, 253, 0.25)");
+                moonGlow.addColorStop(0.5, "rgba(125, 211, 252, 0.08)");
+            }
+            moonGlow.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.fillStyle = moonGlow;
+            ctx.beginPath();
+            ctx.arc(moonX, moonY, 125, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Distant Twilight City Skyline Silhouette
+            ctx.fillStyle = lerpColor("#090d16", "#29150b", state.warmth);
+            const buildings = [
+                [0.02, 0.12, 0.22], [0.15, 0.10, 0.30], [0.27, 0.14, 0.18],
+                [0.44, 0.11, 0.26], [0.58, 0.15, 0.20], [0.76, 0.12, 0.28], [0.89, 0.11, 0.21]
+            ];
+            const groundTop = H * 0.78;
+            buildings.forEach(([bx, bw, bh]) => {
+                ctx.fillRect(W * bx, groundTop - H * bh, W * bw, H * bh);
+            });
+
+            // Vintage Streetlamp on Left
+            const lampX = W * 0.14;
+            ctx.strokeStyle = "#334155";
+            ctx.lineWidth = 4.5;
+            ctx.beginPath();
+            ctx.moveTo(lampX, groundTop);
+            ctx.lineTo(lampX, H * 0.30);
+            ctx.stroke();
+
+            ctx.fillStyle = state.warmth > 0.4 ? "#fde047" : "#bae6fd";
+            ctx.beginPath();
+            ctx.ellipse(lampX, H * 0.28, 12, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            const lampHalo = ctx.createRadialGradient(lampX, H * 0.34, 4, lampX, H * 0.42, 85);
+            lampHalo.addColorStop(0, state.warmth > 0.4 ? "rgba(253, 224, 71, 0.32)" : "rgba(186, 230, 253, 0.22)");
+            lampHalo.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.fillStyle = lampHalo;
+            ctx.beginPath();
+            ctx.arc(lampX, H * 0.40, 85, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Ground / Wet Evening Pavement
+            const groundGrad = ctx.createLinearGradient(0, groundTop, 0, H);
+            groundGrad.addColorStop(0, lerpColor("#1e293b", "#422006", state.warmth));
+            groundGrad.addColorStop(0.4, lerpColor("#0f172a", "#292524", state.warmth));
+            groundGrad.addColorStop(1, "#020617");
+            ctx.fillStyle = groundGrad;
+            ctx.fillRect(0, groundTop, W, H - groundTop);
+
+            ctx.strokeStyle = state.warmth > 0.4
+                ? `rgba(251, 191, 36, ${0.18 * state.warmth})`
+                : "rgba(148, 163, 184, 0.16)";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(0, groundTop + 1);
+            ctx.lineTo(W, groundTop + 1);
+            ctx.stroke();
+        }
+
+        function drawAmbientAtmosphere(dt, state) {
+            const rainAlpha = Math.max(0.08, 0.35 * (1 - state.warmth));
+            ctx.save();
+            ctx.strokeStyle = `rgba(186, 230, 253, ${rainAlpha})`;
+            ctx.lineWidth = 1.2;
+            ctx.lineCap = "round";
+
+            for (const drop of rainDrops) {
+                const x = drop.x * W;
+                const y = (drop.y * H * 1.25) % (H + 30) - 15;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x - 1.5, y + drop.len);
+                ctx.stroke();
+
+                drop.y += drop.speed * dt * 0.9;
+                if (drop.y > 1.15) {
+                    drop.y = -0.05;
+                    drop.x = Math.random();
+                }
+            }
+            ctx.restore();
+
+            // Drifting Romantic Petals
+            const petalAlpha = 0.28 + state.warmth * 0.65;
+            for (const p of ambientPetals) {
+                p.x += p.vx * dt * 15;
+                p.y += p.vy * dt * 15;
+                p.rot += p.vRot * dt;
+
+                if (p.y > 1.15 || p.x < -0.1 || p.x > 1.1) {
+                    p.x = Math.random();
+                    p.y = -0.05;
+                }
+
+                ctx.save();
+                ctx.translate(p.x * W, p.y * H);
+                ctx.rotate(p.rot);
+                ctx.globalAlpha = petalAlpha;
+                ctx.fillStyle = p.hue;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function drawBoy(x, y, state) {
+            ctx.save();
+            const breath = Math.sin(state.time * 2.1) * 1.2;
+            const isSpeaking = state.isMouthMoving;
+            const kneel = state.kneel;
+            const hug = state.hug;
+            const walk = state.walkSpeed;
+            const stride = Math.sin(state.walkCycle) * walk;
+            const walkBob = Math.abs(Math.cos(state.walkCycle)) * walk * 2.5;
+            const wobble = state.activeSpeaker === 'finale' ? Math.sin(state.time * 22) * 3.5 : 0;
+
+            ctx.translate(x + wobble, y);
+
+            // Ground contact shadow
+            ctx.fillStyle = "rgba(0,0,0,0.28)";
+            ctx.beginPath();
+            ctx.ellipse(0, 2, 26 + kneel * 8, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.translate(0, breath - walkBob + kneel * 10);
+            if (state.headTilt) {
+                ctx.rotate(state.headTilt * 0.25);
+            }
+
+            // Soft character rim aura
+            const auraCol = hug > 0.5 ? "rgba(251, 191, 36, 0.32)" : "rgba(96, 165, 250, 0.25)";
+            const aura = ctx.createRadialGradient(0, -65, 8, 0, -65, 90);
+            aura.addColorStop(0, auraCol);
+            aura.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.fillStyle = aura;
+            ctx.beginPath();
+            ctx.arc(0, -65, 90, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+
+            // === LEGS WITH NATURAL WALKING STRIDE OR KNEELING ===
+            ctx.strokeStyle = "#1e3a5f";
+            ctx.lineWidth = 8.5;
+
+            if (kneel > 0.45) {
+                ctx.beginPath();
+                ctx.moveTo(-6, -30);
+                ctx.quadraticCurveTo(-18, -14, -14, -10);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(6, -30);
+                ctx.quadraticCurveTo(18, -14, 14, -10);
+                ctx.stroke();
+
+                ctx.fillStyle = "#0f172a";
+                ctx.beginPath();
+                ctx.ellipse(-15, -9, 7, 3.2, -0.15, 0, Math.PI * 2);
+                ctx.ellipse(15, -9, 7, 3.2, 0.15, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                const leftFootX = -7 - stride * 10;
+                const rightFootX = 7 + stride * 10;
+                const leftFootY = -Math.max(0, -stride) * 4;
+                const rightFootY = -Math.max(0, stride) * 4;
+
+                ctx.beginPath();
+                ctx.moveTo(-6, -30);
+                ctx.lineTo(leftFootX, leftFootY);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(6, -30);
+                ctx.lineTo(rightFootX, rightFootY);
+                ctx.stroke();
+
+                ctx.fillStyle = "#0f172a";
+                ctx.beginPath();
+                ctx.ellipse(leftFootX, leftFootY + 1, 7.5, 3.2, 0, 0, Math.PI * 2);
+                ctx.ellipse(rightFootX, rightFootY + 1, 7.5, 3.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // === TORSO / JACKET ===
+            ctx.fillStyle = "#2563eb";
+            ctx.beginPath();
+            ctx.roundRect(-15, -56, 30, 30, 8);
+            ctx.fill();
+
+            // Subtle jacket highlight
+            ctx.fillStyle = "rgba(255,255,255,0.14)";
+            ctx.beginPath();
+            ctx.roundRect(-10, -54, 10, 24, 4);
+            ctx.fill();
+
+            // === EXPRESSIVE ARMS ===
+            ctx.strokeStyle = "#f5d0c5";
+            ctx.lineWidth = 6.8;
+            if (hug > 0.45) {
+                // Warm embrace wrapped around Momiya
+                ctx.beginPath();
+                ctx.moveTo(10, -52);
+                ctx.quadraticCurveTo(32, -44, 44, -34);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(-10, -50);
+                ctx.quadraticCurveTo(16, -34, 30, -28);
+                ctx.stroke();
+            } else if (kneel > 0.35 || isSpeaking) {
+                // Heartfelt pleading gesture toward Momiya
+                const gesture = isSpeaking ? Math.sin(state.time * 4.5) * 3 : 0;
+                ctx.beginPath();
+                ctx.moveTo(-12, -52);
+                ctx.quadraticCurveTo(-4, -38, 16, -42 + gesture);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(12, -52);
+                ctx.quadraticCurveTo(22, -40, 20, -44 - gesture);
+                ctx.stroke();
+            } else {
+                const armSwing = stride * 7;
+                ctx.beginPath();
+                ctx.moveTo(-12, -52);
+                ctx.quadraticCurveTo(-18, -36, -14 + armSwing, -22);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(12, -52);
+                ctx.quadraticCurveTo(18, -36, 14 - armSwing, -22);
+                ctx.stroke();
+            }
+
+            // === HEAD ===
+            ctx.fillStyle = "#f5d0c5";
+            ctx.beginPath();
+            ctx.arc(0, -75, 16.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Styled Hair
+            ctx.fillStyle = "#0f172a";
+            ctx.beginPath();
+            ctx.ellipse(0, -83, 17.5, 13.5, 0, Math.PI, 0);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(-15, -78);
+            ctx.quadraticCurveTo(-20, -60, -12, -52);
+            ctx.quadraticCurveTo(-10, -64, -12, -78);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(15, -78);
+            ctx.quadraticCurveTo(20, -60, 12, -52);
+            ctx.quadraticCurveTo(10, -64, 12, -78);
+            ctx.fill();
+
+            // Expressive Eyes
+            ctx.fillStyle = "#1e293b";
+            ctx.beginPath();
+            ctx.ellipse(-6, -76, 2.8, 3.6, 0, 0, Math.PI * 2);
+            ctx.ellipse(6, -76, 2.8, 3.6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eye catchlights
+            ctx.fillStyle = "rgba(255,255,255,0.85)";
+            ctx.beginPath();
+            ctx.arc(-5.2, -77, 1.0, 0, Math.PI * 2);
+            ctx.arc(6.8, -77, 1.0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Emotional glistening tears (continues as happy tears in finale!)
+            ctx.fillStyle = state.activeSpeaker === 'finale'
+                ? "rgba(186, 230, 253, 0.95)"
+                : "rgba(125, 211, 252, 0.85)";
+            ctx.beginPath();
+            ctx.ellipse(-6.5, -65 + Math.sin(state.time * 3.4) * 2, 2.2, 3.8, 0, 0, Math.PI * 2);
+            ctx.ellipse(6.5, -66 + Math.sin(state.time * 3.1 + 1) * 2, 2.2, 3.8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Animated Mouth (strictly synced to voice synthesis)
+            ctx.strokeStyle = "#9f1239";
+            ctx.lineWidth = 2.2;
+            ctx.beginPath();
+            if (isSpeaking) {
+                const talkOpen = 2.5 + Math.abs(Math.sin(state.time * 14)) * 3;
+                ctx.ellipse(0, -66.5, 4.2, talkOpen, 0, 0, Math.PI * 2);
+                ctx.fillStyle = "#881337";
+                ctx.fill();
+            } else if (hug > 0.45) {
+                ctx.arc(0, -68, 4.8, 0.18, Math.PI - 0.18);
+                ctx.stroke();
+            } else {
+                ctx.moveTo(-4.5, -66);
+                ctx.quadraticCurveTo(0, -62, 4.5, -66);
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        function drawGirl(x, y, state) {
+            ctx.save();
+            const breath = Math.sin(state.time * 2.2 + 0.8) * 1.2;
+            const isSpeaking = state.isMouthMoving;
+            const hug = state.hug;
+            const walk = state.walkSpeed;
+            const stride = Math.sin(state.walkCycle) * walk;
+            const walkBob = Math.abs(Math.cos(state.walkCycle)) * walk * 2.2;
+            const wobble = state.activeSpeaker === 'finale' ? Math.sin(state.time * 24 + 0.5) * 4.5 : 0;
+
+            ctx.translate(x + wobble, y);
+
+            // Ground contact shadow
+            ctx.fillStyle = "rgba(0,0,0,0.26)";
+            ctx.beginPath();
+            ctx.ellipse(0, 2, 26, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.translate(0, breath - walkBob);
+            if (state.headTilt) {
+                ctx.rotate(state.headTilt * 0.3);
+            }
+
+            // Soft character rim aura
+            const auraCol = hug > 0.5 ? "rgba(251, 191, 36, 0.34)" : "rgba(244, 114, 182, 0.25)";
+            const aura = ctx.createRadialGradient(0, -65, 8, 0, -65, 90);
+            aura.addColorStop(0, auraCol);
+            aura.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.fillStyle = aura;
+            ctx.beginPath();
+            ctx.arc(0, -65, 90, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+
+            // === LEGS WITH NATURAL WALKING STRIDE ===
+            ctx.strokeStyle = "#f5d0c5";
+            ctx.lineWidth = 7.2;
+            const leftFootX = -6 - stride * 9;
+            const rightFootX = 6 + stride * 9;
+            const leftFootY = -Math.max(0, -stride) * 3.5;
+            const rightFootY = -Math.max(0, stride) * 3.5;
+
+            ctx.beginPath();
+            ctx.moveTo(-6, -28);
+            ctx.lineTo(leftFootX, leftFootY);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(6, -28);
+            ctx.lineTo(rightFootX, rightFootY);
+            ctx.stroke();
+
+            ctx.fillStyle = "#be123c";
+            ctx.beginPath();
+            ctx.ellipse(leftFootX, leftFootY + 1, 6.8, 3.0, 0, 0, Math.PI * 2);
+            ctx.ellipse(rightFootX, rightFootY + 1, 6.8, 3.0, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // === FLOWING DRESS ===
+            ctx.fillStyle = "#e11d48";
+            ctx.beginPath();
+            ctx.moveTo(-16, -54);
+            ctx.quadraticCurveTo(-22, -26, -18, -14);
+            ctx.lineTo(18, -14);
+            ctx.quadraticCurveTo(22, -26, 16, -54);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "rgba(255,255,255,0.14)";
+            ctx.beginPath();
+            ctx.moveTo(-6, -52);
+            ctx.quadraticCurveTo(-4, -26, -2, -16);
+            ctx.lineTo(4, -16);
+            ctx.quadraticCurveTo(2, -26, 0, -52);
+            ctx.closePath();
+            ctx.fill();
+
+            // === EXPRESSIVE ARMS ===
+            ctx.strokeStyle = "#f5d0c5";
+            ctx.lineWidth = 6.4;
+            if (hug > 0.45) {
+                // Warm embrace wrapped around Babiya
+                ctx.beginPath();
+                ctx.moveTo(-10, -50);
+                ctx.quadraticCurveTo(-32, -42, -44, -32);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(10, -48);
+                ctx.quadraticCurveTo(-16, -32, -30, -26);
+                ctx.stroke();
+            } else if (isSpeaking) {
+                // Expressive hand gesture while speaking
+                const wave = Math.sin(state.time * 4.2) * 3.5;
+                ctx.beginPath();
+                ctx.moveTo(-11, -50);
+                ctx.quadraticCurveTo(-22, -40, -16, -34 + wave);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(11, -50);
+                ctx.quadraticCurveTo(18, -34, 10, -26);
+                ctx.stroke();
+            } else {
+                const armSwing = stride * 6;
+                ctx.beginPath();
+                ctx.moveTo(-11, -50);
+                ctx.quadraticCurveTo(-17, -34, -13 + armSwing, -22);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(11, -50);
+                ctx.quadraticCurveTo(17, -34, 13 - armSwing, -22);
+                ctx.stroke();
+            }
+
+            // === HEAD ===
+            ctx.fillStyle = "#f5d0c5";
+            ctx.beginPath();
+            ctx.arc(0, -74, 17, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Long Flowing Hair
+            ctx.fillStyle = "#1e1b4b";
+            ctx.beginPath();
+            ctx.ellipse(0, -82, 18.5, 14.5, 0, Math.PI, 0);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(-15, -76);
+            ctx.quadraticCurveTo(-22, -52, -13, -38);
+            ctx.quadraticCurveTo(-9, -52, -11, -74);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(15, -76);
+            ctx.quadraticCurveTo(22, -52, 13, -38);
+            ctx.quadraticCurveTo(9, -52, 11, -74);
+            ctx.fill();
+
+            // Expressive Eyes
+            ctx.fillStyle = "#1e293b";
+            ctx.beginPath();
+            ctx.ellipse(-6.5, -75, 3.0, 3.8, 0, 0, Math.PI * 2);
+            ctx.ellipse(6.5, -75, 3.0, 3.8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "rgba(255,255,255,0.85)";
+            ctx.beginPath();
+            ctx.arc(-5.6, -76, 1.0, 0, Math.PI * 2);
+            ctx.arc(7.4, -76, 1.0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Happy tears flowing down Momiya's cheeks during the hug finale
+            if (hug > 0.35 || state.activeSpeaker === 'finale') {
+                ctx.fillStyle = "rgba(186, 230, 253, 0.95)";
+                ctx.beginPath();
+                ctx.ellipse(-6.8, -64 + Math.sin(state.time * 3.5) * 2, 2.2, 3.8, 0, 0, Math.PI * 2);
+                ctx.ellipse(6.8, -65 + Math.sin(state.time * 3.2 + 0.8) * 2, 2.2, 3.8, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Mouth (strictly synced to voice synthesis)
+            ctx.strokeStyle = "#be123c";
+            ctx.lineWidth = 2.2;
+            ctx.beginPath();
+            if (isSpeaking) {
+                const talkOpen = 2.4 + Math.abs(Math.sin(state.time * 13 + 0.5)) * 2.8;
+                ctx.ellipse(0, -65.5, 4.0, talkOpen, 0, 0, Math.PI * 2);
+                ctx.fillStyle = "#9f1239";
+                ctx.fill();
+            } else if (hug > 0.45 || state.activeSpeaker === 'finale') {
+                ctx.arc(0, -66.5, 5.0, 0.15, Math.PI - 0.15);
+                ctx.stroke();
+            } else {
+                ctx.moveTo(-4.5, -65.5);
+                ctx.quadraticCurveTo(0, -62, 4.5, -65.5);
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        function drawParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= p.decay;
+
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, p.alpha);
+                if (p.type === 'cloud') {
+                    ctx.fillStyle = p.color;
+                    ctx.shadowColor = p.color;
+                    ctx.shadowBlur = 14;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (p.type === 'emoji') {
+                    ctx.font = '26px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(p.text, p.x, p.y);
+                }
+                ctx.restore();
+            }
+        }
+
+        function drawGroundPoops(dt) {
+            const groundY = H * 0.78;
+            for (let i = 0; i < groundPoops.length; i++) {
+                const gp = groundPoops[i];
+                gp.targetY = groundY - 1;
+                gp.emergeProgress = Math.min(1, gp.emergeProgress + dt * 4.8);
+
+                if (!gp.landed) {
+                    gp.x += gp.vx;
+                    gp.vy += 0.38;
+                    gp.y += gp.vy;
+                    gp.rotation += gp.vRot;
+                    if (gp.y >= gp.targetY) {
+                        gp.y = gp.targetY;
+                        gp.vy = 0;
+                        gp.vx = 0;
+                        gp.rotation = 0;
+                        gp.landed = true;
+                    }
+                } else {
+                    gp.wobbleTime += dt;
+                }
+
+                ctx.save();
+                ctx.translate(gp.x, gp.y);
+
+                // Ground contact shadow grows smoothly as it approaches the ground
+                const heightRatio = Math.max(0, Math.min(1, 1 - (gp.targetY - gp.y) / 36));
+                ctx.fillStyle = `rgba(0, 0, 0, ${0.38 * heightRatio})`;
+                ctx.beginPath();
+                ctx.ellipse(0, gp.targetY - gp.y + 2, 14 * heightRatio, 4.2 * heightRatio, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.rotate(gp.rotation);
+
+                const impactDamp = gp.landed ? Math.exp(-gp.wobbleTime * 3.0) : 0;
+                const squishX = gp.landed
+                    ? 1 + Math.sin(gp.wobbleTime * 11) * impactDamp * 0.24
+                    : 0.75 + gp.emergeProgress * 0.2;
+                const squishY = gp.landed
+                    ? 1 - Math.sin(gp.wobbleTime * 11) * impactDamp * 0.24
+                    : 0.8 + gp.emergeProgress * 0.32;
+                ctx.scale(squishX, squishY);
+
+                // Realistic multi-tiered shaded cartoon swirl
+                const drawTier = (cx, cy, rx, ry, baseCol, hiCol) => {
+                    ctx.fillStyle = baseCol;
+                    ctx.beginPath();
+                    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = hiCol;
+                    ctx.beginPath();
+                    ctx.ellipse(cx - rx * 0.25, cy - ry * 0.25, rx * 0.45, ry * 0.35, -0.2, 0, Math.PI * 2);
+                    ctx.fill();
+                };
+
+                // Bottom, middle, and top tiers
+                drawTier(0, -4, 13.5, 5.5, '#5c3317', '#7c4722');
+                drawTier(0, -10.5, 10.2, 4.8, '#6b3e1e', '#8c542b');
+                drawTier(0, -16.5, 6.8, 3.8, '#784623', '#9c6035');
+
+                // Classic curled top tip
+                ctx.fillStyle = '#784623';
+                ctx.beginPath();
+                ctx.moveTo(-3.2, -18.5);
+                ctx.quadraticCurveTo(0, -26.5, 4.5, -23.5);
+                ctx.quadraticCurveTo(1.5, -20.5, 3.2, -18.5);
+                ctx.closePath();
+                ctx.fill();
+
+                // Rising wavy heat/stink lines after landing
+                if (gp.landed) {
+                    ctx.strokeStyle = 'rgba(190, 242, 100, 0.55)';
+                    ctx.lineWidth = 1.6;
+                    ctx.lineCap = 'round';
+                    for (let w = -1; w <= 1; w += 2) {
+                        const waveShift = Math.sin(gp.wobbleTime * 4 + w) * 2.5;
+                        ctx.beginPath();
+                        ctx.moveTo(w * 5, -28);
+                        ctx.quadraticCurveTo(w * 5 + waveShift, -34, w * 5 - waveShift * 0.5, -40);
+                        ctx.stroke();
+                    }
+                }
+
+                ctx.restore();
+            }
+        }
+
+        function drawCanvasScene(state, dt) {
+            drawBackground(state);
+            drawAmbientAtmosphere(dt, state);
+            drawGroundPoops(dt);
+
+            const groundY = H * 0.78;
+            const boyX = W * charRig.boyXRatio;
+            const girlX = W * charRig.girlXRatio;
+            const isHugging = charRig.hugProgress > 0.45;
+            const leanOffset = charRig.hugProgress * 6;
+            const headTilt = charRig.hugProgress * 0.14;
+            const boyMouthMoving = isVoiceSpeaking && state.activeSpeaker === 'boy';
+            const girlMouthMoving = isVoiceSpeaking && state.activeSpeaker === 'girl';
+
+            // Background wrapping arms when hugging
+            if (isHugging) {
+                ctx.save();
+                ctx.lineCap = "round";
+                ctx.strokeStyle = "#e8b4a8";
+                ctx.lineWidth = 6.5;
+                ctx.beginPath();
+                ctx.moveTo(boyX + leanOffset + 8, groundY - 50);
+                ctx.quadraticCurveTo((boyX + girlX) * 0.5 + 8, groundY - 46, girlX - leanOffset + 8, groundY - 48);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            drawBoy(boyX + leanOffset, groundY, {
+                time: state.time,
+                activeSpeaker: state.activeSpeaker,
+                isMouthMoving: boyMouthMoving,
+                kneel: charRig.boyKneel,
+                hug: charRig.hugProgress,
+                headTilt: headTilt,
+                walkSpeed: state.boyWalkSpeed,
+                walkCycle: charRig.walkCycleBoy,
+                warmth: charRig.warmth
+            });
+
+            drawGirl(girlX - leanOffset, groundY, {
+                time: state.time,
+                activeSpeaker: state.activeSpeaker,
+                isMouthMoving: girlMouthMoving,
+                hug: charRig.hugProgress,
+                headTilt: -headTilt * 1.15,
+                walkSpeed: state.girlWalkSpeed,
+                walkCycle: charRig.walkCycleGirl,
+                warmth: charRig.warmth
+            });
+
+            // Front embracing arms & hands layered over torsos for a genuine close hug
+            if (isHugging) {
+                ctx.save();
+                ctx.lineCap = "round";
+                // Boy's foreground arm wrapping securely across Girl's back
+                ctx.strokeStyle = "#f5d0c5";
+                ctx.lineWidth = 7.2;
+                ctx.beginPath();
+                ctx.moveTo(boyX + leanOffset - 6, groundY - 50);
+                ctx.quadraticCurveTo((boyX + girlX) * 0.5 + 4, groundY - 38, girlX - leanOffset + 11, groundY - 43);
+                ctx.stroke();
+
+                // Boy's hand resting gently on Girl's back
+                ctx.fillStyle = "#f5d0c5";
+                ctx.beginPath();
+                ctx.ellipse(girlX - leanOffset + 12, groundY - 43, 4.5, 3.4, 0.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Girl's foreground arm wrapping tenderly around Boy's upper back/shoulder
+                ctx.strokeStyle = "#f5d0c5";
+                ctx.lineWidth = 6.6;
+                ctx.beginPath();
+                ctx.moveTo(girlX - leanOffset + 6, groundY - 51);
+                ctx.quadraticCurveTo((boyX + girlX) * 0.5 - 2, groundY - 55, boyX + leanOffset - 11, groundY - 51);
+                ctx.stroke();
+
+                // Girl's hand resting on Boy's shoulder
+                ctx.fillStyle = "#f5d0c5";
+                ctx.beginPath();
+                ctx.ellipse(boyX + leanOffset - 12, groundY - 51, 4.2, 3.2, -0.25, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            drawFloatingTag("Babiya", boyX + leanOffset * 0.5, groundY - 108 + charRig.boyKneel * 10, "#2563eb", "#93c5fd", state.time);
+            drawFloatingTag("Momiya", girlX - leanOffset * 0.5, groundY - 108, "#e11d48", "#fda4af", state.time);
+
+            drawParticles();
+        }
+
+        let lastLoopTime = performance.now();
+
+        function animationLoop(now) {
+            const dt = Math.min((now - lastLoopTime) / 1000, 0.05);
+            lastLoopTime = now;
+            const t = now * 0.001;
+
+            // Target positions & poses per dialogue beat for realistic walking and body movement
+            let targetBoyX = 0.26;
+            let targetGirlX = 0.74;
+            let targetBoyKneel = 0;
+            let targetHug = 0;
+            let targetWarmth = 0;
+
+            if (currentStepIndex === 0) {
+                targetBoyX = 0.37;
+                targetGirlX = 0.68;
+                targetBoyKneel = 0.25;
+            } else if (currentStepIndex === 1) {
+                targetBoyX = 0.37;
+                targetGirlX = 0.62;
+                targetBoyKneel = 0.4;
+            } else if (currentStepIndex === 2) {
+                targetBoyX = 0.41;
+                targetGirlX = 0.61;
+                targetBoyKneel = 1.0;
+            } else if (currentStepIndex === 3) {
+                targetBoyX = 0.43;
+                targetGirlX = 0.55;
+                targetBoyKneel = 0.45;
+                targetWarmth = 0.65;
+            } else if (currentStepIndex === 4) {
+                targetBoyX = 0.478;
+                targetGirlX = 0.522;
+                targetBoyKneel = 0;
+                targetHug = 1.0;
+                targetWarmth = 1.0;
+            }
+
+            const prevBoyX = charRig.boyXRatio;
+            const prevGirlX = charRig.girlXRatio;
+
+            charRig.boyXRatio = lerp(charRig.boyXRatio, targetBoyX, dt * 2.6);
+            charRig.girlXRatio = lerp(charRig.girlXRatio, targetGirlX, dt * 2.6);
+            charRig.boyKneel = lerp(charRig.boyKneel, targetBoyKneel, dt * 3.2);
+            charRig.hugProgress = lerp(charRig.hugProgress, targetHug, dt * 3.0);
+            charRig.warmth = lerp(charRig.warmth, targetWarmth, dt * 2.2);
+
+            const boyDelta = Math.abs(charRig.boyXRatio - prevBoyX) / Math.max(dt, 0.001);
+            const girlDelta = Math.abs(charRig.girlXRatio - prevGirlX) / Math.max(dt, 0.001);
+
+            const boyWalkSpeed = Math.min(1, boyDelta * 8);
+            const girlWalkSpeed = Math.min(1, girlDelta * 8);
+
+            if (boyWalkSpeed > 0.05) charRig.walkCycleBoy += dt * 11;
+            if (girlWalkSpeed > 0.05) charRig.walkCycleGirl += dt * 11;
+
+            drawCanvasScene({
+                time: t,
+                activeSpeaker,
+                boyWalkSpeed,
+                girlWalkSpeed,
+                warmth: charRig.warmth
+            }, dt);
+
+            requestAnimationFrame(animationLoop);
+        }
+
+        /**
+         * =========================================================================
+         * 6. PLAYBACK SEQUENCE CONTROLLER & EVENT LISTENERS
+         * =========================================================================
+         */
+        function stopSkit(completedNaturally = false) {
+            isPlayingSequence = false;
+            isVoiceSpeaking = false;
+            clearTimeout(fallbackTimer);
+            try {
+                window.speechSynthesis.cancel();
+            } catch (e) {}
+
+            playBtnIcon.textContent = completedNaturally ? '🔄' : '▶️';
+            playBtnText.textContent = completedNaturally ? 'Play Again' : 'Play Full Scene';
+            sceneCounter.textContent = completedNaturally ? 'Scene: Hugging Forever ❤️' : 'Scene: Stopped';
+            updateStatusBadge(completedNaturally ? 'Hugging Forever ❤️' : 'Ready to Play', false);
+
+            if (completedNaturally) {
+                // Keep currentStepIndex at 4 (finale) so Babiya and Momiya stay locked in their hug until Play Again is clicked
+                currentStepIndex = 4;
+                activeSpeaker = 'finale';
+                highlightActiveCard(4);
+            } else {
+                currentStepIndex = -1;
+                activeSpeaker = 'none';
+                groundPoops.length = 0;
+                highlightActiveCard(-1);
+                bubbleSpeakerBadge.textContent = 'Director Cue';
+                dialogueText.textContent = 'Press "Play Full Scene" to start the Bhojpuri skit!';
+                progressBar.style.width = '0%';
+                progressLabel.textContent = `0 / ${SKIT_LINES.length}`;
+            }
+        }
+
+        function playSequenceStep(index) {
+            if (!isPlayingSequence || index >= SKIT_LINES.length) {
+                stopSkit(true);
+                return;
+            }
+
+            if (index === 0) {
+                groundPoops.length = 0;
+            }
+
+            currentStepIndex = index;
+            const line = SKIT_LINES[index];
+            updateStageVisuals(line);
+            highlightActiveCard(index);
+
+            const pct = ((index + 1) / SKIT_LINES.length) * 100;
+            progressBar.style.width = `${pct}%`;
+            progressLabel.textContent = `${index + 1} / ${SKIT_LINES.length}`;
+
+            if (line.speaker === 'finale') {
+                updateStatusBadge('Finale Hug & FX!', true);
+                playCartoonFartSound();
+                spawnFartClouds();
+                speakLine(line, () => {
+                    if (!isPlayingSequence) return;
+                    setTimeout(() => stopSkit(true), 2200);
+                });
+            } else {
+                updateStatusBadge(`${line.name} Speaking...`, true);
+                speakLine(line, () => {
+                    if (!isPlayingSequence) return;
+                    setTimeout(() => playSequenceStep(index + 1), 350);
+                });
+            }
+        }
+
+        // Event Listeners
+        playSceneBtn.addEventListener('click', () => {
+            initAudioContext();
+            if (isPlayingSequence) {
+                stopSkit(false);
+                return;
+            }
+            isPlayingSequence = true;
+            playBtnIcon.textContent = '⏸️';
+            playBtnText.textContent = 'Stop Scene';
+            playSequenceStep(0);
+        });
+
+        stopSceneBtn.addEventListener('click', () => stopSkit(false));
+
+        testFartBtn.addEventListener('click', () => {
+            initAudioContext();
+            playCartoonFartSound();
+            spawnFartClouds();
+        });
+
+        storyCanvas.addEventListener('click', () => {
+            initAudioContext();
+            spawnFartClouds();
+        });
+
+        boyPitchSlider.addEventListener('input', (e) => {
+            boyPitchVal.textContent = parseFloat(e.target.value).toFixed(2);
+        });
+
+        girlPitchSlider.addEventListener('input', (e) => {
+            girlPitchVal.textContent = parseFloat(e.target.value).toFixed(2);
+        });
+
+        speechRateSlider.addEventListener('input', (e) => {
+            speechRateVal.textContent = `${parseFloat(e.target.value).toFixed(2)}x`;
+        });
+
+        resetVoicesBtn.addEventListener('click', () => {
+            boyPitchSlider.value = '0.78';
+            girlPitchSlider.value = '1.35';
+            speechRateSlider.value = '0.95';
+            boyPitchVal.textContent = '0.78';
+            girlPitchVal.textContent = '1.35';
+            speechRateVal.textContent = '0.95x';
+            loadVoices();
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+
+        window.onload = function () {
+            resizeCanvas();
+            renderScriptCards();
+            loadVoices();
+            if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = loadVoices;
+            }
+            requestAnimationFrame(animationLoop);
+        };
+    </script>
+</body>
+</html>
